@@ -28,6 +28,7 @@ int main(int argc, char const *argv[]) {
     
     char *server_ip = inet_ntoa(server_endpt.sin_addr);
 
+    printf("Connecting to server: %s:%d\n", server_ip, ntohs(server_endpt.sin_port));
     
 
 
