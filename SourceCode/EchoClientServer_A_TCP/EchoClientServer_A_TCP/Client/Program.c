@@ -39,7 +39,6 @@ int main(int argc, char const *argv[])
   char receive_buffer[RECEIVE_BUFFER_SIZE];
 
   memset(receive_buffer, 0, sizeof(receive_buffer));
-
   byte_count = read(socket_desc, receive_buffer, sizeof(receive_buffer));
 
   close(socket_desc);

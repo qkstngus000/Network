@@ -5,10 +5,11 @@
 #include <unistd.h>
 #include <arpa/inet.h>
 
-
+#define TRUE 1
 #define SERVER_IP_ADDRESS "127.0.0.1"
 #define SERVER_PORT 20984
 #define RECEIVE_BUFFER_SIZE 1024
+#define SEND_BUFFER_SIZE 1024
 
 
 int connectServer() {
@@ -40,8 +41,30 @@ int connectServer() {
     if (getsockname(client_socket_desc, (struct sockaddr *)&client_socket_endpt, &client_endpt_length) < 0) {
         perror("getsockname Failure");
     }
+    char *client_ip = inet_ntoa(client_socket_endpt.sin_addr);
+    printf("Client Endpoint: %s:%d\n", client_ip, ntohs(client_socket_endpt.sin_port));
     
+    char *receive_buffer;
+    char *send_buffer;
+    while (TRUE) {
+        //connect to server socket file descriptor
+        socklen_t sock_len = sizeof(struct sockaddr_in);
+        int server_socket_desc = accept(client_socket_desc, (struct sockaddr *)&server_socket_endpt, &sock_len);
 
+        // Receieve server dialogue
+        receive_buffer = (char *)malloc(RECEIVE_BUFFER_SIZE);
+        if (read(client_socket_desc, receive_buffer, RECEIVE_BUFFER_SIZE) < 0) perror("Read Failure");
+        else printf("%s\n", receive_buffer);
+        memset(receive_buffer, 0, RECEIVE_BUFFER_SIZE);
+        
+        // Respond to server
+        char prompt_response;
+        scanf("%c", &prompt_response);
+        if (write(server_socket_desc, &prompt_response, 2));
+
+
+    }
+        
     return 0;
 }
 

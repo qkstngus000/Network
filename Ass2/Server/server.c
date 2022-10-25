@@ -8,11 +8,8 @@
 #define SERVER_IP_ADDRESS "0.0.0.0"
 #define SERVER_PORT 20984
 #define RECEIVE_BUFFER_SIZE 1024
+#define SEND_BUFFER_SIZE 1024
 
-int main(int argc, char const *argv[]) {
-    connectClient();
-    return 0;
-}
 
 int connectClient() {
     // Server would need both of client and server end points
@@ -30,7 +27,7 @@ int connectClient() {
 
     // bind: Assign name of socket
     // USAGE: bind(int sockfd, const struct sockaddr *addr, socklen_t addrlen);
-    if (bind(server_socket_desc, &server_socket_endpt, sizeof(struct sockaddr_in)) < 0) {
+    if (bind(server_socket_desc, (struct sockaddr *)&server_socket_endpt, sizeof(struct sockaddr_in)) < 0) {
         perror("Bind Failure");
     }
     
@@ -38,4 +35,29 @@ int connectClient() {
     if (listen(server_socket_desc, 10) < 0) {
         perror("Listen Failure");
     } 
+
+    char *receive_buffer;
+    char *send_buffer;
+    // Wait for client response
+    while (TRUE) {
+        printf("Waiting for client connection...\n");
+        socklen_t sock_len = sizeof(struct sockaddr_in);
+        int client_socket_desc = accept(server_socket_desc, (struct sockaddr *)&client_socket_endpt, &sock_len);
+        
+        char *client_ip = inet_ntoa(client_socket_endpt.sin_addr);
+        printf("Accepted connection: %s:%d\n\n", client_ip, ntohs(client_socket_endpt.sin_port));
+
+        const char starting_prompt[] = "Would you like to play (y/n)?\0";
+        if (write(client_socket_desc, starting_prompt, strlen(starting_prompt)) < 0) perror("Write Failure");
+        
+        if (read(server_socket_desc, receive_buffer, RECEIVE_BUFFER_SIZE)< 0) perror("Read Failure");
+        else printf("Receieved from client: %s", receive_buffer);
+
+    }
+
+}
+
+int main(int argc, char const *argv[]) {
+    connectClient();
+    return 0;
 }
