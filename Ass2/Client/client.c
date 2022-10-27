@@ -4,6 +4,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <arpa/inet.h>
+#include "Utilities.h"
 
 #define TRUE 1
 #define SERVER_IP_ADDRESS "127.0.0.1"
@@ -49,7 +50,6 @@ int connectServer() {
     while (TRUE) {
         //connect to server socket file descriptor
         socklen_t sock_len = sizeof(struct sockaddr_in);
-        int server_socket_desc = accept(client_socket_desc, (struct sockaddr *)&server_socket_endpt, &sock_len);
 
         // Receieve server dialogue
         receive_buffer = (char *)malloc(RECEIVE_BUFFER_SIZE);
@@ -59,10 +59,11 @@ int connectServer() {
         
         // Respond to server
         char prompt_response;
-        scanf("%c", &prompt_response);
-        if (write(server_socket_desc, &prompt_response, 2));
+        char * message = (char *)malloc(sizeof(char *))
+        scanf(message, sizeof(char));
+        if (write(client_socket_desc, &prompt_response, sizeof(char)) < 0) perror("write to server failure");
 
-
+        printf("write to server completed");
     }
         
     return 0;

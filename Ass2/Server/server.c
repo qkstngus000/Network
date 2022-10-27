@@ -3,6 +3,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <arpa/inet.h>
+#include "Utilities.h"
 
 #define TRUE 1
 #define SERVER_IP_ADDRESS "0.0.0.0"
@@ -34,7 +35,7 @@ int connectClient() {
     // listen: mark socket that will be used to accpet incoming connection request
     if (listen(server_socket_desc, 10) < 0) {
         perror("Listen Failure");
-    } 
+    }
 
     char *receive_buffer;
     char *send_buffer;
@@ -50,7 +51,8 @@ int connectClient() {
         const char starting_prompt[] = "Would you like to play (y/n)?\0";
         if (write(client_socket_desc, starting_prompt, strlen(starting_prompt)) < 0) perror("Write Failure");
         
-        if (read(server_socket_desc, receive_buffer, RECEIVE_BUFFER_SIZE)< 0) perror("Read Failure");
+
+        if (read(client_socket_desc, receive_buffer, sizeof(char))< 0) perror("Read Failure");
         else printf("Receieved from client: %s", receive_buffer);
 
     }
