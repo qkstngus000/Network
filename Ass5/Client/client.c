@@ -21,17 +21,27 @@ int main(int argc, char const *argv[])
 
   while (quit != 0)
   {
-    //Input user's message
-    read_user_input("Enter message or quit to exit: ", message, MESSAGE_BUFFER_SIZE);
-  
-    //Send user's message to server
-    send_message(sock_desc, message);
+    // Receive Client prompt message
+    if (receive_message(sock_desc, receive_buffer, RECEIVE_BUFFER_SIZE) < 0) perror("Receive Prompt Failure");
+    printf("%s", receive_buffer);
 
-    //Receive echoed message from server
-    receive_message(sock_desc, receive_buffer, RECEIVE_BUFFER_SIZE);
-    printf("Server message received: %s \n", receive_buffer);
+    //Input user's response to prompt
+    read_user_input("", message, MESSAGE_BUFFER_SIZE);
 
-    quit = strcmp(message, "quit");
+    if (strcmp(message, "n") == 0) {
+      if (send_message(sock_desc, message) < 0) perror("Prompt Response Send Failure");
+    }
+    else {
+      //Send user's message to server
+      read_user_input("Enter message: ", message, MESSAGE_BUFFER_SIZE);
+      if (send_message(sock_desc, message) < 0) perror("Message Send Failure");
+
+      //Receive echoed message from server
+      receive_message(sock_desc, receive_buffer, RECEIVE_BUFFER_SIZE);
+      printf("Server message received: %s \n", receive_buffer);
+    }
+    
+    quit = strcmp(message, "n");
   }
   
   close(sock_desc);

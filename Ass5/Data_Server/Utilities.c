@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
+#include <time.h>
 
 int create_tcp_server_socket(struct sockaddr_in* sock_addr, sa_family_t sa_family, const char * ip_addr, in_port_t port, int type)
 {
@@ -108,3 +109,14 @@ void read_user_input(char* prompt, char* read_buffer, int read_buffer_size)
   read_buffer[strcspn(read_buffer, "\n")] = 0;
 }
 
+int write_message(char* filename, char* client_ip_addr, char* message) {
+  time_t t = time(NULL);
+  //printf("\n Current date and time is : %s", ctime(&t));
+  FILE* fptr;
+  fptr = fopen(filename, "a");
+  fprintf(fptr, "%s", ctime(&t));
+  fprintf(fptr, "%s\n", client_ip_addr);
+  fprintf(fptr, "%s\n\n", message);
+  fclose(fptr);
+return 0;
+}

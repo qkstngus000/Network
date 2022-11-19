@@ -26,5 +26,6 @@ int receive_udp_message(int socket_desc, struct sockaddr_in* sock_addr, char * r
 //TCP & UDP
 void init_sock_addr_in(struct sockaddr_in* sock_addr, sa_family_t sa_family, const char * ip_addr, in_port_t port);
 void read_user_input(char* prompt, char* read_buffer, int read_buffer_size);
+int write_message(char* filename, char* client_ip_addr, char* message);
 
 #endif
