@@ -22,8 +22,7 @@ int main(int argc, char const *argv[])
 
   int server_sock_desc = create_tcp_server_socket(&server_endpoint, AF_INET, IP_ADDRESS, SERVER_PORT, SOCK_STREAM);
   
-  // Connect to data server
-  int data_sock_desc = connect_server(&data_endpoint, AF_INET, IP_ADDRESS, DATA_PORT, SOCK_STREAM);
+
 
   
   printf("Listening on Network Interface: %s Network Port: %d \n", IP_ADDRESS, SERVER_PORT);
@@ -37,7 +36,7 @@ int main(int argc, char const *argv[])
 
     char *client_ip = inet_ntoa(client_endpoint.sin_addr);
 
-    printf("Accepted connection: %s:%d\n", client_ip, ntohs(client_endpoint.sin_port));
+    printf("Accepted connection: %s:%d\n\n", client_ip, ntohs(client_endpoint.sin_port));
 
     int quit = -1;
 
@@ -48,13 +47,33 @@ int main(int argc, char const *argv[])
       //Receive message from client
       if (receive_message(client_sock_desc, receive_buffer, RECEIVE_BUFFER_SIZE) < 0) perror("Prompt Response Receving Failure");
       
-      // If user respond not to send message b
+      // If user respond to send message
       if (strcmp(receive_buffer, "n") != 0) {
-        printf("Client message received: %s", receive_buffer);
-      }
+        printf("Client message received: %s\n", receive_buffer);
+  
+        // Connect to data server
+        int data_sock_desc = connect_server(&data_endpoint, AF_INET, IP_ADDRESS, DATA_PORT, SOCK_STREAM);
 
-      //Echo message back to client
-      send_message(data_sock_desc, receive_buffer);
+        // Send message to data_server
+        send_message(data_sock_desc, receive_buffer);
+
+        // Rceive message from data_server status
+        receive_message(data_sock_desc, receive_buffer, RECEIVE_BUFFER_SIZE);
+
+        printf("Relay server status message: %s\n\n", receive_buffer);
+
+        // Send status message to client
+        send_message(client_sock_desc, receive_buffer);
+
+        // Receive CLient Acknowledgement message for receiving status message
+        receive_message(client_sock_desc, receive_buffer, RECEIVE_BUFFER_SIZE);
+        if (strcmp(receive_buffer, "Acknowledgement") != 0) {
+          perror ("Acknowledgement failed");
+        }
+
+        // send acknowledgement to data server
+      }
+      
       
       quit = strcmp(receive_buffer, "n");
     }
